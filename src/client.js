@@ -15,7 +15,7 @@ export class OddSocketsClient extends EventEmitter {
     super();
     
     this.config = {
-      managerUrl: 'https://manager1.oddsockets.tyga.network',
+      managerUrl: 'https://connect.oddsockets.tyga.network',
       timeout: 10000,
       heartbeatInterval: 30000,
       reconnectAttempts: 5,
