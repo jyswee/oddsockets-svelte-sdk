@@ -508,7 +508,7 @@ Creates a reactive store for connection status.
 ```javascript
 const config = {
   apiKey: 'ak_your_api_key_here',        // Required
-  managerUrl: 'https://manager1.oddsockets.tyga.network', // Optional
+  managerUrl: 'https://connect.oddsockets.tyga.network', // Optional
   userId: 'user123',                      // Optional
   timeout: 10000,                         // Optional (ms)
   heartbeatInterval: 30000,               // Optional (ms)
