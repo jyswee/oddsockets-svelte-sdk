@@ -41,7 +41,7 @@
  */
 
 // Import the JavaScript SDK as the core dependency (single source of truth)
-import OddSocketsJS from '@oddsocketsai/javascript-sdk';
+import OddSocketsJS from 'oddsockets-js';
 
 // Re-export core JavaScript SDK classes and utilities
 export const OddSockets = OddSocketsJS.OddSockets || OddSocketsJS;
