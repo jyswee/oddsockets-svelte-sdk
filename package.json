@@ -1,6 +1,6 @@
 {
   "name": "oddsockets-svelte",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0",
   "description": "Official Svelte SDK for OddSockets real-time messaging platform with reactive stores and component integration",
   "main": "src/index.js",
   "module": "src/index.js",
@@ -45,7 +45,7 @@
   "homepage": "https://oddsockets.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jyswee/oddsockets-svelte-sdk.git"
+    "url": "git+https://github.com/jyswee/oddsockets-svelte-sdk.git"
   },
   "bugs": {
     "url": "https://github.com/jyswee/oddsockets-svelte-sdk/issues"
