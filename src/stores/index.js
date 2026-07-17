@@ -9,7 +9,7 @@
 
 import { writable, derived, readable } from 'svelte/store';
 import { onDestroy } from 'svelte';
-import OddSocketsJS from '@oddsocketsai/javascript-sdk';
+import OddSocketsJS from 'oddsockets-js';
 
 /**
  * Create a reactive store for an OddSockets client using the JavaScript SDK

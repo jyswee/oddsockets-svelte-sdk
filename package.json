@@ -1,49 +1,29 @@
 {
-  "name": "oddsockets-svelte-sdk",
+  "name": "oddsockets-svelte",
   "version": "0.1.0-beta.1",
   "description": "Official Svelte SDK for OddSockets real-time messaging platform with reactive stores and component integration",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "src/index.js",
+  "module": "src/index.js",
   "svelte": "src/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "svelte": "./src/index.js",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./src/index.js"
     },
     "./stores": {
-      "types": "./dist/stores.d.ts",
       "svelte": "./src/stores/index.js",
-      "import": "./dist/stores.mjs",
-      "require": "./dist/stores.js"
-    },
-    "./components": {
-      "types": "./dist/components.d.ts",
-      "svelte": "./src/components/index.js",
-      "import": "./dist/components.mjs",
-      "require": "./dist/components.js"
+      "import": "./src/stores/index.js"
     }
   },
   "files": [
-    "dist/",
     "src/",
     "README.md",
-    "CHANGELOG.md"
+    "LICENSE"
   ],
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage",
     "lint": "eslint src --ext .js,.svelte",
     "lint:fix": "eslint src --ext .js,.svelte --fix",
-    "format": "prettier --write src/**/*.{js,svelte}",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
-    "prepublishOnly": "npm run build && npm run test && npm run lint",
-    "example:dev": "cd examples/basic && npm run dev",
-    "example:build": "cd examples/basic && npm run build"
+    "format": "prettier --write src/**/*.{js,svelte}"
   },
   "keywords": [
     "svelte",
@@ -60,7 +40,7 @@
     "presence",
     "bulk-publishing"
   ],
-  "author": "OddSockets Team <support@oddsockets.com>",
+  "author": "Joe Wee, Tyga.Cloud Ltd <jyswee@gmail.com>",
   "license": "MIT",
   "homepage": "https://oddsockets.com",
   "repository": {
@@ -77,8 +57,7 @@
     "svelte": "^4.0.0 || ^5.0.0"
   },
   "dependencies": {
-    "@oddsocketsai/javascript-sdk": "file:../javascript",
-    "ws": "^8.14.2",
+    "oddsockets-js": "^1.0.0",
     "eventemitter3": "^5.0.1"
   },
   "devDependencies": {
