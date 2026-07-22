@@ -1,0 +1,15 @@
+OddSockets Svelte SDK - two-client round-trip proof
+Captured: 2026-07-22T07:47:25Z
+Command: docker run --rm -e ODDSOCKETS_API_KEY=ak_... oddsockets-svelte-demo
+
+[connect] connecting both clients...
+[alice] worker w002-oddsockets-1
+[bob]   worker w002-oddsockets-1
+[connect] alice = connected, bob = connected
+[alice] subscribed to demo-544250 (presence on)
+[bob] published, messageId = 51dcedf0-3656-4fbe-aae8-0afb254ea5de
+[alice] received bob's message (nonce matched) - real round-trip.
+[alice] presence: 1 user(s).
+[alice] unsubscribed.
+
+OK - cross-client round-trip verified
