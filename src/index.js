@@ -40,13 +40,14 @@
  * ```
  */
 
-// Import the JavaScript SDK as the core dependency (single source of truth)
-import OddSocketsJS from 'oddsockets-js';
+// The Svelte SDK ships its own genuine Socket.IO client (socket.io-client),
+// so it is self-contained - no external SDK dependency at runtime.
+import { OddSocketsClient } from './client.js';
+import { OddSocketsChannel } from './channel.js';
 
-// Re-export core JavaScript SDK classes and utilities
-export const OddSockets = OddSocketsJS.OddSockets || OddSocketsJS;
-export const Channel = OddSocketsJS.Channel;
-export const PubNubCompat = OddSocketsJS.PubNubCompat;
+// Re-export the core client and channel classes.
+export const OddSockets = OddSocketsClient;
+export const Channel = OddSocketsChannel;
 
 // Re-export Svelte-specific stores and components
 export { 
@@ -93,8 +94,7 @@ export { OddSocketsError } from './errors.js';
  * ```
  */
 export function createOddSocketsClient(config) {
-  // Use the JavaScript SDK's create method or constructor
-  return OddSocketsJS.create ? OddSocketsJS.create(config) : new OddSocketsJS(config);
+  return new OddSocketsClient(config);
 }
 
 /**
@@ -153,25 +153,6 @@ export function createChannels(client, channelNames) {
  */
 export async function bulkPublish(client, messages) {
   return await client.publishBulk(messages);
-}
-
-/**
- * Create a PubNub-compatible client using the JavaScript SDK core
- * 
- * @param {Object} config - PubNub-style configuration
- * @returns {PubNubCompat} PubNub-compatible client from JavaScript SDK
- * 
- * @example
- * ```js
- * const pubnub = createPubNubCompat({
- *   publishKey: 'ak_your_api_key_here',
- *   subscribeKey: 'ak_your_api_key_here',
- *   userId: 'user123'
- * });
- * ```
- */
-export function createPubNubCompat(config) {
-  return OddSocketsJS.createPubNubCompat ? OddSocketsJS.createPubNubCompat(config) : new PubNubCompat(config);
 }
 
 /**
@@ -308,29 +289,26 @@ export const ErrorCode = {
 export const Version = {
   version: '0.1.0-beta.1',
   sdkName: 'OddSockets-Svelte-SDK',
-  userAgent: 'OddSockets-Svelte-SDK/0.1.0-beta.1',
-  jsSDKVersion: OddSocketsJS.version || 'unknown'
+  userAgent: 'OddSockets-Svelte-SDK/0.1.0-beta.1'
 };
 
 // Default export for convenience (maintains compatibility)
 export default {
-  // Core JavaScript SDK functionality
+  // Core client functionality
   createOddSocketsClient,
   createChannel,
   createChannels,
   bulkPublish,
-  createPubNubCompat,
-  
+
   // Message creation utilities
   createMessage,
   createChatMessage,
   createNotification,
-  
-  // Core classes from JavaScript SDK
+
+  // Core classes
   OddSockets,
   Channel,
-  PubNubCompat,
-  
+
   // Svelte-specific exports
   createChannelStore: () => { throw new Error('Import createChannelStore from "oddsockets-svelte-sdk/stores"'); },
   createConnectionStore: () => { throw new Error('Import createConnectionStore from "oddsockets-svelte-sdk/stores"'); },

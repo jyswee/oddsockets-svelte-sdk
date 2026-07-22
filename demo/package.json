@@ -1,0 +1,16 @@
+{
+  "name": "oddsockets-svelte-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Runnable pub/sub round-trip demo for the OddSockets Svelte SDK",
+  "type": "module",
+  "scripts": {
+    "demo": "node demo.mjs"
+  },
+  "dependencies": {
+    "oddsockets-svelte": "file:.."
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

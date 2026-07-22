@@ -9,7 +9,7 @@
 
 import { writable, derived, readable } from 'svelte/store';
 import { onDestroy } from 'svelte';
-import OddSocketsJS from 'oddsockets-js';
+import { OddSocketsClient } from '../client.js';
 
 /**
  * Create a reactive store for an OddSockets client using the JavaScript SDK
@@ -19,7 +19,7 @@ import OddSocketsJS from 'oddsockets-js';
  */
 export function createOddSocketsStore(config) {
   // Create the JavaScript SDK client instance (single source of truth)
-  const client = OddSocketsJS.create ? OddSocketsJS.create(config) : new OddSocketsJS(config);
+  const client = new OddSocketsClient(config);
   
   // Reactive stores
   const connectionState = writable('disconnected');
@@ -154,7 +154,7 @@ export function createOddSocketsStore(config) {
  */
 export function createChannelStore(channelName, config, options = {}) {
   // Create client using JavaScript SDK
-  const client = OddSocketsJS.create ? OddSocketsJS.create(config) : new OddSocketsJS(config);
+  const client = new OddSocketsClient(config);
   const channel = client.channel(channelName);
   
   // Reactive stores
@@ -332,7 +332,7 @@ export function createPresenceStore(channelName, config) {
  */
 export function createMultiChannelStore(channelNames, config, options = {}) {
   // Create client using JavaScript SDK
-  const client = OddSocketsJS.create ? OddSocketsJS.create(config) : new OddSocketsJS(config);
+  const client = new OddSocketsClient(config);
   
   // Create channel stores for each channel
   const channelStores = {};
@@ -438,7 +438,7 @@ export function createMultiChannelStore(channelNames, config, options = {}) {
  * @returns {Object} Reactive stores and methods
  */
 export function createAnalyticsStore(config) {
-  const client = OddSocketsJS.create ? OddSocketsJS.create(config) : new OddSocketsJS(config);
+  const client = new OddSocketsClient(config);
   
   // Analytics stores
   const messageStats = writable({
