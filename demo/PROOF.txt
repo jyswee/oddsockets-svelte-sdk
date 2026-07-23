@@ -13,3 +13,20 @@ Command: docker run --rm -e ODDSOCKETS_API_KEY=ak_... oddsockets-svelte-demo
 [alice] unsubscribed.
 
 OK - cross-client round-trip verified
+
+
+OddSockets Svelte SDK - enhanced-events receive-path proof
+Captured: 2026-07-23T10:27:34Z
+Command: ODDSOCKETS_API_KEY=ak_... node enhanced-regress.mjs
+
+[connect] connecting both clients...
+[alice] worker w002-oddsockets-1
+[bob]   worker w002-oddsockets-1
+[connect] alice = connected, bob = connected
+[both] subscribed to enh-597604
+[bob] enhanced.startTyping(bob) ...
+[bob] published messageId=72f7fea1-f11b-4420-83b7-57f828fa1dc5, enhanced.addReaction :thumbsup: ...
+[alice] received 'user_typing' from bob (channel enh-597604) - broadcast round-trip.
+[alice] received 'reaction_added' (:thumbsup:) from bob - broadcast round-trip.
+
+OK - enhanced broadcast receive-path verified (user_typing + reaction_added)

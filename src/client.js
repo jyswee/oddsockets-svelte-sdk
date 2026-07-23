@@ -14,6 +14,24 @@ import EventEmitter from 'eventemitter3';
 import { io } from 'socket.io-client';
 import { OddSocketsChannel } from './channel.js';
 import { OddSocketsError } from './errors.js';
+import { EnhancedFeatures } from './enhanced-features.js';
+
+// Enhanced-feature broadcasts the worker pushes to subscribers. These are
+// re-emitted onto the client event surface so apps can listen with
+// client.on('reaction_added', handler), client.on('user_typing', handler), etc.
+const ENHANCED_BROADCAST_EVENTS = [
+  'reaction_added', 'reaction_removed',
+  'user_typing', 'user_stopped_typing',
+  'user_read', 'unread_count_updated', 'all_marked_read',
+  'thread_reply', 'thread_subscribed', 'thread_followed', 'thread_unfollowed', 'thread_read_updated',
+  'message_edited', 'message_deleted', 'message_pinned', 'message_unpinned',
+  'user_status_changed', 'custom_status_updated', 'custom_status_cleared',
+  'dnd_status_changed', 'status_updated',
+  'file_upload_completed', 'file_upload_progress', 'file_upload_failed',
+  'dm_created', 'dm_received',
+  'notification', 'notification_read', 'all_notifications_read', 'notifications_cleared',
+  'channel_created', 'channel_updated', 'user_invited', 'user_joined_channel', 'user_left_channel', 'user_removed'
+];
 
 export class OddSocketsClient extends EventEmitter {
   constructor(config) {
@@ -40,6 +58,11 @@ export class OddSocketsClient extends EventEmitter {
     this.reconnectCount = 0;
     this.connectionPromise = null;
     this.clientIdentifier = this._generateClientIdentifier();
+
+    // Enhanced features (Slack-like events: reactions, threads, presence, DMs,
+    // notifications, search). Actions travel over the Socket.IO connection;
+    // inbound broadcasts arrive on the client event surface (see below).
+    this.enhanced = new EnhancedFeatures(this);
 
     if (this.config.autoConnect) {
       this.connect();
@@ -200,6 +223,12 @@ export class OddSocketsClient extends EventEmitter {
           channel[handler](data);
         }
       });
+    }
+
+    // Forward enhanced-feature broadcasts to the client event surface so apps
+    // can listen with client.on('reaction_added', handler), etc.
+    for (const event of ENHANCED_BROADCAST_EVENTS) {
+      this.socket.on(event, (data) => this.emit(event, data));
     }
   }
 
