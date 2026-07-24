@@ -691,6 +691,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="#enhanced" class="nav-link">
+                            <i class="fas fa-bolt nav-icon"></i>
+                            Enhanced Features
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="#performance" class="nav-link">
                             <i class="fas fa-chart-line nav-icon"></i>
                             Performance
@@ -913,3 +919,378 @@
                         <button class="code-copy" onclick="copyCode(this)">
                             <i class="fas fa-copy"></i>
                             Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-svelte">&lt;script&gt;
+  import { createConnectionStore } from 'oddsockets-svelte-sdk/stores';
+
+  const { connectionState, isConnected, reconnectAttempts } = createConnectionStore({
+    apiKey: 'ak_your_api_key_here'
+  });
+&lt;/script&gt;
+
+&lt;div class="status {$connectionState}"&gt;{$connectionState}&lt;/div&gt;
+
+{#if $isConnected}
+  &lt;span&gt;Live&lt;/span&gt;
+{:else if $reconnectAttempts &gt; 0}
+  &lt;span&gt;Reconnecting (attempt {$reconnectAttempts})&lt;/span&gt;
+{/if}</code></pre>
+                </div>
+            </section>
+
+            <section id="stores" class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-database"></i>
+                    Reactive Stores
+                </h2>
+                <p>The Svelte SDK's core strength is its reactive stores &mdash; subscribe once and let Svelte
+                update the UI automatically as messages, presence and connection state change.</p>
+
+                <h3 class="section-subtitle">Channel Store</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">svelte</span>
+                        <button class="code-copy" onclick="copyCode(this)">
+                            <i class="fas fa-copy"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-svelte">&lt;script&gt;
+  import { createChannelStore } from 'oddsockets-svelte-sdk/stores';
+
+  const {
+    messages, presence, messageCount, presenceCount, latestMessage,
+    publish, subscribe, unsubscribe
+  } = createChannelStore('my-channel', { apiKey: 'ak_your_api_key_here' });
+&lt;/script&gt;
+
+&lt;div&gt;Messages: {$messageCount} &middot; Online: {$presenceCount}&lt;/div&gt;
+
+{#if $latestMessage}
+  &lt;div&gt;Latest: {$latestMessage.data.text}&lt;/div&gt;
+{/if}</code></pre>
+                </div>
+
+                <h3 class="section-subtitle">Multi-Channel Store</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">svelte</span>
+                        <button class="code-copy" onclick="copyCode(this)">
+                            <i class="fas fa-copy"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-svelte">&lt;script&gt;
+  import { createMultiChannelStore } from 'oddsockets-svelte-sdk/stores';
+
+  const { channels, allMessages, totalPresence } = createMultiChannelStore(
+    ['chat', 'notifications', 'updates'],
+    { apiKey: 'ak_your_api_key_here' }
+  );
+&lt;/script&gt;
+
+&lt;div&gt;Total users: {$totalPresence}&lt;/div&gt;
+
+{#each $allMessages as message}
+  &lt;div data-channel="{message.channel}"&gt;{message.data.text}&lt;/div&gt;
+{/each}</code></pre>
+                </div>
+            </section>
+
+            <section id="examples" class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-code"></i>
+                    Examples
+                </h2>
+                <p>Explore complete working examples in the <code>examples/</code> directory of the repository:</p>
+                <div class="quick-links">
+                    <a href="../examples/index.html" class="quick-link">
+                        <h4 class="quick-link-title">
+                            <i class="fas fa-folder-open"></i>
+                            View All Examples
+                        </h4>
+                        <p>Basic chat, multi-channel, SvelteKit integration, reusable components and enhanced features.</p>
+                    </a>
+                    <a href="https://github.com/jyswee/oddsockets-svelte-sdk" class="quick-link">
+                        <h4 class="quick-link-title">
+                            <i class="fab fa-github"></i>
+                            Source on GitHub
+                        </h4>
+                        <p>Browse the full source, stores, and component library.</p>
+                    </a>
+                </div>
+            </section>
+
+            <section id="enhanced" class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-bolt"></i>
+                    Enhanced Features
+                </h2>
+                <p>Beyond core pub/sub, OddSockets ships a Slack-like <strong>enhanced surface</strong> &mdash;
+                reactions, typing indicators, threads, read receipts, presence/status, notifications, DMs,
+                channel management, message editing and search. It lives on <code>client.enhanced</code>,
+                where <code>client</code> is the instance returned by <code>createOddSocketsClient</code>.
+                <strong>Send</strong> an action with a <code>client.enhanced.*</code> method; <strong>receive</strong>
+                the paired broadcast with <code>client.on('&lt;event&gt;', handler)</code> &mdash; the worker forwards
+                every enhanced broadcast onto the client event surface.</p>
+
+                <h3 class="section-subtitle">Typing &amp; Reactions</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">javascript</span>
+                        <button class="code-copy" onclick="copyCode(this)">
+                            <i class="fas fa-copy"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-javascript">import { createOddSocketsClient } from 'oddsockets-svelte-sdk';
+
+const client = createOddSocketsClient({ apiKey: 'ak_your_api_key_here', userId: 'alice' });
+const channel = client.channel('room-42');
+await channel.subscribe(() => {}, { enablePresence: true });
+
+// Receive-path: broadcasts from other users on the channel
+client.on('user_typing',    (data) => console.log(`${data.userId} is typing`));
+client.on('reaction_added', (data) => console.log(`${data.userId} reacted ${data.emoji}`));
+
+// Send-path: enhanced actions over the live socket (positional args)
+client.enhanced.startTyping('alice', 'room-42');
+client.enhanced.addReaction('msg-1', 'room-42', ':thumbsup:', 'alice', 'Alice');</code></pre>
+                </div>
+
+                <h3 class="section-subtitle">Threads</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">javascript</span>
+                        <button class="code-copy" onclick="copyCode(this)">
+                            <i class="fas fa-copy"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-javascript">client.on('thread_reply', (data) => console.log('new thread reply', data));
+
+const reply = await client.enhanced.threadReply(
+  'room-42', 'msg-1', 'Replying in the thread', 'alice', 'Alice'
+);
+
+// Query methods return a Promise that resolves with the worker response
+const thread = await client.enhanced.getThread('thread-1');</code></pre>
+                </div>
+
+                <p>Each area exposes methods on <code>client.enhanced</code>; the worker broadcasts the paired
+                events which you handle with <code>client.on(...)</code>:</p>
+                <ul>
+                    <li><strong>Typing</strong> &mdash; <code>startTyping</code>, <code>stopTyping</code> &rarr; <code>user_typing</code>, <code>user_stopped_typing</code></li>
+                    <li><strong>Reactions</strong> &mdash; <code>addReaction</code>, <code>removeReaction</code>, <code>getReactions</code> &rarr; <code>reaction_added</code>, <code>reaction_removed</code></li>
+                    <li><strong>Threads</strong> &mdash; <code>threadReply</code>, <code>getThread</code>, <code>subscribeThread</code>, <code>followThread</code>, <code>markThreadRead</code> &rarr; <code>thread_reply</code>, <code>thread_subscribed</code>, <code>thread_followed</code>, <code>thread_read_updated</code></li>
+                    <li><strong>Read receipts</strong> &mdash; <code>markRead</code>, <code>markAllRead</code>, <code>getUnreadCounts</code> &rarr; <code>user_read</code>, <code>unread_count_updated</code>, <code>all_marked_read</code></li>
+                    <li><strong>Messages</strong> &mdash; <code>editMessage</code>, <code>deleteMessage</code>, <code>pinMessage</code>, <code>unpinMessage</code>, <code>getPinnedMessages</code> &rarr; <code>message_edited</code>, <code>message_deleted</code>, <code>message_pinned</code>, <code>message_unpinned</code></li>
+                    <li><strong>Presence &amp; status</strong> &mdash; <code>setStatus</code>, <code>setCustomStatus</code>, <code>setDND</code>, <code>getUserPresence</code> &rarr; <code>user_status_changed</code>, <code>custom_status_updated</code>, <code>dnd_status_changed</code></li>
+                    <li><strong>Channels</strong> &mdash; <code>createChannel</code>, <code>updateChannel</code>, <code>archiveChannel</code>, <code>inviteToChannel</code>, <code>joinChannel</code>, <code>leaveChannel</code> &rarr; <code>channel_created</code>, <code>channel_updated</code>, <code>user_invited</code>, <code>user_joined_channel</code>, <code>user_left_channel</code></li>
+                    <li><strong>DMs</strong> &mdash; <code>createDM</code>, <code>sendDM</code>, <code>getDMConversations</code> &rarr; <code>dm_created</code>, <code>dm_received</code></li>
+                    <li><strong>Notifications</strong> &mdash; <code>subscribeNotifications</code>, <code>getNotifications</code>, <code>markNotificationRead</code>, <code>clearNotifications</code> &rarr; <code>notification</code>, <code>notification_read</code>, <code>notifications_cleared</code></li>
+                    <li><strong>Search</strong> &mdash; <code>searchMessages</code>, <code>searchInChannel</code>, <code>searchByUser</code>, <code>filterMessages</code> (results returned via <code>Promise</code>)</li>
+                </ul>
+                <p>For any worker event not wrapped above, subscribe with the raw
+                <code>client.on('&lt;event&gt;', handler)</code> API &mdash; all enhanced broadcasts are forwarded onto
+                the client surface.</p>
+            </section>
+
+            <section id="performance" class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Performance
+                </h2>
+                <p>Keep reactive rendering fast by capping the messages you render and keying each loop.</p>
+
+                <h3 class="section-subtitle">Efficient Rendering</h3>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">svelte</span>
+                        <button class="code-copy" onclick="copyCode(this)">
+                            <i class="fas fa-copy"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-svelte">&lt;script&gt;
+  import { createChannelStore } from 'oddsockets-svelte-sdk/stores';
+
+  const { messages } = createChannelStore('chat', { apiKey: 'ak_your_api_key_here' });
+
+  // Only render the most recent messages for smooth updates
+  $: recentMessages = $messages.slice(-50);
+&lt;/script&gt;
+
+{#each recentMessages as message (message.id)}
+  &lt;div class="message"&gt;{message.data.text}&lt;/div&gt;
+{/each}</code></pre>
+                </div>
+
+                <ul>
+                    <li><strong>Low latency</strong> real-time delivery over a genuine Socket.IO connection.</li>
+                    <li><strong>32KB</strong> message size limit for predictable performance.</li>
+                    <li><strong>Automatic reconnection</strong> with exponential backoff and session stickiness.</li>
+                    <li><strong>Bulk publishing</strong> via <code>client.publishBulk(messages)</code> for high-throughput fan-out.</li>
+                </ul>
+            </section>
+
+            <section id="sveltekit" class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-layer-group"></i>
+                    SvelteKit
+                </h2>
+                <p>The SDK connects from the browser, so create stores inside <code>onMount</code> (guarded by the
+                <code>browser</code> flag) to avoid running during server-side rendering.</p>
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang">svelte</span>
+                        <button class="code-copy" onclick="copyCode(this)">
+                            <i class="fas fa-copy"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code class="language-svelte">&lt;!-- src/routes/chat/+page.svelte --&gt;
+&lt;script&gt;
+  import { browser } from '$app/environment';
+  import { createChannelStore } from 'oddsockets-svelte-sdk/stores';
+  import { onMount } from 'svelte';
+
+  let store;
+
+  onMount(() =&gt; {
+    if (browser) {
+      store = createChannelStore('chat', { apiKey: 'ak_your_api_key_here' });
+      store.subscribe();
+      return () =&gt; store.unsubscribe();
+    }
+  });
+&lt;/script&gt;
+
+{#if store}
+  {#each $store.messages as message}
+    &lt;div&gt;{message.data.text}&lt;/div&gt;
+  {/each}
+{:else}
+  &lt;div&gt;Loading chat...&lt;/div&gt;
+{/if}</code></pre>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Tyga.Cloud Ltd. oddsockets.com is a division of Tyga.Cloud Ltd. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Copy code functionality
+        function copyCode(button) {
+            const codeContainer = button.closest('.code-container');
+            const codeElement = codeContainer.querySelector('code');
+
+            if (codeElement) {
+                const code = codeElement.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                    }, 2000);
+                }).catch(() => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = code;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                    }, 2000);
+                });
+            }
+        }
+
+        // Tab functionality
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Mobile menu functionality
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        function closeMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    document.querySelectorAll('.nav-link').forEach(navLink => navLink.classList.remove('active'));
+                    this.classList.add('active');
+                    closeMobileMenu();
+                }
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeMobileMenu();
+            }
+        });
+
+        // Initialize Prism.js
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightAll();
+            }
+        });
+    </script>
+</body>
+</html>
