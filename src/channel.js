@@ -214,7 +214,12 @@ export class OddSocketsChannel extends EventEmitter {
       const socket = this.client._getSocket();
 
       const onHistory = (data) => {
-        if (data.channel !== this.name) return;
+        // Only resolve on the explicit get_history RESPONSE (query:true). The
+        // worker also emits 'history' as a fire-and-forget on-join snapshot
+        // (capped at ~10 local messages, no query flag); without this guard
+        // getHistory() could resolve with that snapshot instead of the requested
+        // count from the shared store. BUG-2026-0727-0012.
+        if (data.channel !== this.name || data.query !== true) return;
         socket.off('history', onHistory);
         socket.off('error', onError);
         resolve(data.messages || []);
