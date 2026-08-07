@@ -49,6 +49,11 @@ export class OddSocketsClient extends EventEmitter {
       throw new OddSocketsError('API key is required', 'INVALID_CONFIGURATION');
     }
 
+    // Reject a malformed manager up front rather than letting it surface later
+    // as a confusing fetch error. The configured manager is used verbatim: if
+    // it is unreachable the connection fails, we never retarget the default.
+    this.config.managerUrl = this._validateManagerUrl(this.config.managerUrl);
+
     this.state = 'disconnected';
     this.workerUrl = null;
     this.workerId = null;
@@ -67,6 +72,22 @@ export class OddSocketsClient extends EventEmitter {
     if (this.config.autoConnect) {
       this.connect();
     }
+  }
+
+  _validateManagerUrl(url) {
+    let parsed;
+    try {
+      parsed = new URL(url);
+    } catch (e) {
+      throw new OddSocketsError(`Invalid managerUrl: ${url}`, 'INVALID_CONFIGURATION');
+    }
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      throw new OddSocketsError(
+        `Invalid managerUrl protocol '${parsed.protocol}' in ${url} (expected http or https)`,
+        'INVALID_CONFIGURATION'
+      );
+    }
+    return url.replace(/\/+$/, '');
   }
 
   async connect() {
