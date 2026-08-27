@@ -133,6 +133,42 @@ npm install oddsockets-svelte-sdk
 </style>
 ```
 
+## Token auth for game clients (`tokenProvider`)
+
+Ship apps with **no API key in the bundle**. Your backend verifies the player
+(its own login/JWT), calls `POST /v1/token` on the OddSockets front door, and
+returns a short-lived realtime token. The SDK asks your `tokenProvider` for a
+fresh token before every (re)connect and silently refreshes it before expiry.
+
+```js
+import { createOddSocketsClient } from 'oddsockets-svelte-sdk';
+
+const client = createOddSocketsClient({
+  tokenProvider: async () => {
+    // Ask YOUR backend for a short-lived OddSockets token.
+    const res = await fetch('https://your-game-backend.example/realtime-token', {
+      headers: { Authorization: `Bearer ${playerJwt}` }
+    });
+    // Return the mint response as-is: {token, expiresAt, exp, ...}
+    // (a raw JWT string also works).
+    return res.json();
+  },
+  userId: 'player-42'
+});
+
+client.on('token_refreshed', ({ expiresAt }) => {
+  console.log('realtime token refreshed, expires', expiresAt);
+});
+```
+
+Notes:
+
+- `tokenProvider` is used **instead of** `apiKey` — configure one or the other.
+- The refresh fires `tokenRefreshLeadMs` (default 120000 ms) before expiry and
+  emits `token_refreshed`; a failed refresh emits `token_refresh_failed`.
+- Works with the stores too — pass `tokenProvider` in the config object you
+  give `createChannelStore` / `createOddSocketsStore`.
+
 ## 🏪 Reactive Stores
 
 The Svelte SDK's main strength is its reactive stores that automatically update your UI.
