@@ -236,7 +236,84 @@ export class EnhancedFeatures {
     return this._emitWithResponse('search_by_user', params, 'user_search_results');
   }
 
+  // ==================== CHALLENGE / LEADERBOARD / ACHIEVEMENT EVENTS ====================
+
+  async createChallenge(params) {
+    return this._emitWithAck('challenge_create', params, 'challenge_create_success', 'challenge_create');
+  }
+
+  reportProgress(params) {
+    this._getSocket().emit('challenge_progress', params);
+  }
+
+  async completeChallenge(params) {
+    return this._emitWithAck('challenge_complete', params, 'challenge_complete_success', 'challenge_complete');
+  }
+
+  unlockAchievement(params) {
+    this._getSocket().emit('achievement_unlock', params);
+  }
+
+  async getStandings(params) {
+    return this._emitWithAck('challenge_standings', params, 'challenge_standings_success', 'challenge_standings');
+  }
+
+  async getAchievements(params) {
+    return this._emitWithAck('achievement_query', params, 'achievement_state', 'achievement_query');
+  }
+
+  async sendChallengeInvite(params) {
+    return this._emitWithAck('challenge_invite', params, 'challenge_invite_success', 'challenge_invite');
+  }
+
+  async replyChallengeInvite(params) {
+    return this._emitWithAck('challenge_reply', params, 'challenge_reply_success', 'challenge_reply');
+  }
+
+  async cancelChallengeInvite(params) {
+    return this._emitWithAck('challenge_invite_cancel', params, 'challenge_invite_cancel_success', 'challenge_invite_cancel');
+  }
+
+  async getChallengeInvites(params = {}) {
+    return this._emitWithAck('challenge_invites_query', params, 'challenge_invites', 'challenge_invites_query');
+  }
+
   // ==================== PRIVATE METHODS ====================
+
+  // Request/ack with an error path: emit the action, resolve on the success
+  // event, reject when the worker emits an 'error' whose event matches ours.
+  _emitWithAck(event, params, successEvent, errorKey) {
+    return new Promise((resolve, reject) => {
+      const socket = this._getSocket();
+
+      const cleanup = () => {
+        clearTimeout(timeoutId);
+        socket.off(successEvent, onSuccess);
+        socket.off('error', onError);
+      };
+
+      const timeoutId = setTimeout(() => {
+        cleanup();
+        reject(new Error(`Timeout waiting for ${successEvent}`));
+      }, this.timeout);
+
+      const onSuccess = (data) => {
+        cleanup();
+        resolve(data);
+      };
+
+      const onError = (error) => {
+        if (error && error.event === errorKey) {
+          cleanup();
+          reject(new Error(error.message || `Request failed: ${event}`));
+        }
+      };
+
+      socket.once(successEvent, onSuccess);
+      socket.once('error', onError);
+      socket.emit(event, params);
+    });
+  }
 
   _emitWithResponse(event, params, responseEvent) {
     return new Promise((resolve, reject) => {

@@ -30,7 +30,9 @@ const ENHANCED_BROADCAST_EVENTS = [
   'file_upload_completed', 'file_upload_progress', 'file_upload_failed',
   'dm_created', 'dm_received',
   'notification', 'notification_read', 'all_notifications_read', 'notifications_cleared',
-  'channel_created', 'channel_updated', 'user_invited', 'user_joined_channel', 'user_left_channel', 'user_removed'
+  'channel_created', 'channel_updated', 'user_invited', 'user_joined_channel', 'user_left_channel', 'user_removed',
+  'challenge_progress', 'leaderboard_rank_change', 'challenge_complete', 'achievement_unlock', 'achievement_progress',
+  'challenge_invited', 'challenge_reply_received', 'challenge_invite_cancelled'
 ];
 
 export class OddSocketsClient extends EventEmitter {
