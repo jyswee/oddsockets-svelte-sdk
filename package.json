@@ -1,26 +1,28 @@
 {
   "name": "oddsockets-svelte",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Official Svelte SDK for OddSockets real-time messaging platform with reactive stores and component integration",
-  "main": "src/index.js",
-  "module": "src/index.js",
-  "svelte": "src/index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "svelte": "dist/index.js",
   "exports": {
     ".": {
-      "svelte": "./src/index.js",
-      "import": "./src/index.js"
+      "svelte": "./dist/index.js",
+      "import": "./dist/index.js"
     },
     "./stores": {
-      "svelte": "./src/stores/index.js",
-      "import": "./src/stores/index.js"
+      "svelte": "./dist/stores/index.js",
+      "import": "./dist/stores/index.js"
     }
   },
   "files": [
-    "src/",
+    "dist/",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
+    "build": "node scripts/build.cjs",
+    "prepublishOnly": "npm run build",
     "lint": "eslint src --ext .js,.svelte",
     "lint:fix": "eslint src --ext .js,.svelte --fix",
     "format": "prettier --write src/**/*.{js,svelte}"
@@ -57,8 +59,8 @@
     "svelte": "^4.0.0 || ^5.0.0"
   },
   "dependencies": {
-    "socket.io-client": "^4.7.2",
-    "eventemitter3": "^5.0.1"
+    "eventemitter3": "^5.0.1",
+    "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -73,6 +75,7 @@
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-svelte": "^2.35.1",
+    "javascript-obfuscator": "^5.6.0",
     "jsdom": "^23.0.1",
     "prettier": "^3.1.0",
     "prettier-plugin-svelte": "^3.1.2",
