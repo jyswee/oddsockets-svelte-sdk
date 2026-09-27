@@ -352,6 +352,62 @@ export class OddSocketsClient extends EventEmitter {
     return results;
   }
 
+  /**
+   * Fetch this tenant's headline usage analytics (MAU / DAU / total messages /
+   * error rate) from the manager. Requires an apiKey — keyless/token-only
+   * clients have no owner scope to query.
+   *
+   * Tiles are returned verbatim: a metric that is not live yet comes back as
+   * null (never a fabricated zero) so callers can render an em-dash.
+   *
+   * @returns {Promise<{mau: number|null, dau: number|null, totalMessages: number|null, errorRate: number|null, ownerScope: string, detail: string|null, timestamp: string}>}
+   */
+  async getUsageStats() {
+    if (this._isTokenMode() || !this.config.apiKey) {
+      throw new OddSocketsError(
+        'getUsageStats requires an apiKey (keyless/token clients have no owner scope to query)',
+        'INVALID_CONFIGURATION'
+      );
+    }
+
+    // The manager URL is resolved and validated in the constructor and used
+    // verbatim for worker selection — reuse the same endpoint here.
+    let response;
+    try {
+      response = await fetch(`${this.config.managerUrl}/api/tenant/usage`, {
+        method: 'GET',
+        headers: {
+          'X-API-Key': this.config.apiKey,
+          'User-Agent': 'OddSockets-Svelte-SDK/0.1.0'
+        }
+      });
+    } catch (error) {
+      throw new OddSocketsError(
+        'Manager is offline. Cannot fetch usage stats.',
+        'CONNECTION_FAILED'
+      );
+    }
+
+    if (!response.ok) {
+      throw new OddSocketsError(
+        `Usage stats request failed: ${response.status} ${response.statusText}`,
+        'CONNECTION_FAILED'
+      );
+    }
+
+    const data = (await response.json()) || {};
+    const tiles = data.tiles || {};
+    return {
+      mau: tiles.mau ?? null,
+      dau: tiles.dau ?? null,
+      totalMessages: tiles.totalMessages ?? null,
+      errorRate: tiles.errorRate ?? null,
+      ownerScope: data.ownerScope,
+      detail: data.detail ?? null,
+      timestamp: data.timestamp
+    };
+  }
+
   // Internal: socket accessor for the Channel class.
   _getSocket() {
     return this.socket;
