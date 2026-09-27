@@ -9,7 +9,7 @@
 import EventEmitter from 'eventemitter3';
 import { OddSocketsError } from './errors.js';
 
-// 32KB - matches the worker's message size limit (PubNub/Socket.IO standard).
+// 32KB - matches the server-enforced message size limit.
 const MAX_MESSAGE_SIZE = 32768;
 
 function validateMessageSize(message) {
