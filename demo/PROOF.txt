@@ -3,8 +3,6 @@ Captured: 2026-07-22T07:47:25Z
 Command: docker run --rm -e ODDSOCKETS_API_KEY=ak_... oddsockets-svelte-demo
 
 [connect] connecting both clients...
-[alice] worker [instance]
-[bob]   worker [instance]
 [connect] alice = connected, bob = connected
 [alice] subscribed to demo-544250 (presence on)
 [bob] published, messageId = 51dcedf0-3656-4fbe-aae8-0afb254ea5de
@@ -20,8 +18,6 @@ Captured: 2026-07-23T10:27:34Z
 Command: ODDSOCKETS_API_KEY=ak_... node enhanced-regress.mjs
 
 [connect] connecting both clients...
-[alice] worker [instance]
-[bob]   worker [instance]
 [connect] alice = connected, bob = connected
 [both] subscribed to enh-597604
 [bob] enhanced.startTyping(bob) ...

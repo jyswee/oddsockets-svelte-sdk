@@ -28,9 +28,6 @@ let settled = false;
 const alice = createOddSocketsClient({ apiKey, userId: 'alice', autoConnect: false });
 const bob = createOddSocketsClient({ apiKey, userId: 'bob', autoConnect: false });
 
-alice.on('worker_assigned', (d) => console.log(`[alice] worker ${d.workerId}`));
-bob.on('worker_assigned', (d) => console.log(`[bob]   worker ${d.workerId}`));
-
 // Enhanced broadcasts must surface on alice's PUBLIC event surface.
 alice.on('user_typing', (d) => {
   if (d && d.userId === 'bob') {

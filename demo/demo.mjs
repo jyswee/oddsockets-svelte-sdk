@@ -32,9 +32,6 @@ let settled = false;
 const alice = createOddSocketsClient({ apiKey, userId: 'alice', autoConnect: false });
 const bob = createOddSocketsClient({ apiKey, userId: 'bob', autoConnect: false });
 
-alice.on('worker_assigned', (d) => console.log(`[alice] worker ${d.workerId}`));
-bob.on('worker_assigned', (d) => console.log(`[bob]   worker ${d.workerId}`));
-
 function finish(code, message) {
   if (settled) return;
   settled = true;
